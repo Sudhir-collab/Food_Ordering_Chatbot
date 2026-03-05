@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sewa Restaurant — Fast & Fresh</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent:#ff6b35;
+      --accent-2:#ffd166;
+      --bg:#fffaf5;
+      --card:#fff;
+      --muted:#6b6b6b;
+      --radius:16px;
+      --max-width:1100px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      font-family:Roboto, system-ui, sans-serif;
+      margin:0;
+      background:linear-gradient(180deg,var(--bg), #fff);
+      color:#222;
+    }
+    .container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:28px;
+    }
+
+    .filter-btn{
+      background:#eee;
+      border:none;
+      padding:10px 18px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:700;
+      transition:0.2s;
+    }
+    .filter-btn.active{
+      background:var(--accent);
+      color:white;
+    }
+
+    .menu-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap:20px;
+    }
+
+    .menu-card{
+      background:#fff;
+      border-radius:12px;
+      padding:14px;
+      box-shadow:0 4px 14px rgba(0,0,0,0.06);
+      transition:0.2s ease;
+    }
+    .menu-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .menu-img{
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      border-radius:10px;
+    }
+
+    /* Toast */
+    .result-toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      min-width: 280px;
+      background: #111827;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 99999;
+      font-family: Arial, sans-serif;
+      line-height: 1.3;
+      white-space: pre-wrap;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from{opacity:0; transform:translateY(10px);}
+      to{opacity:1; transform:translateY(0);}
+    }
+
+    .item-row{
+      display:flex; align-items:center; gap:12px;
+      padding:12px 8px;
+      border-bottom:1px dashed rgba(0,0,0,0.04);
+    }
+    .thumb-small img{
+      width:78px;height:78px;border-radius:10px;object-fit:cover;
+    }
+    .qty-controls{display:flex; gap:8px;}
+    .qty-btn{
+      padding:6px 10px;
+      border-radius:8px;
+      border:1px solid #e6e6e6;
+      cursor:pointer;
+    }
+    .qty-num{min-width:28px;text-align:center;font-weight:700;}
+    .cart-title{font-size:18px;font-weight:800;}
+    .cart-row{display:flex; justify-content:space-between; padding:8px 0;}
+    .cart-total{text-align:right; font-weight:900; font-size:18px; margin-top:12px;}
+
+    .action-btn{
+      width:100%;
+      padding:12px;
+      background:var(--accent);
+      color:white;
+      font-weight:800;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      margin-top:8px;
+    }
+
+    .quick-actions{display:flex; gap:8px; flex-wrap:wrap;}
+    .quick-actions input{
+      padding:8px;border-radius:8px;border:1px solid #ddd;width:140px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <header style="display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex;gap:12px;align-items:center;">
+        <img src="logo.png" style="width:64px;height:64px;border-radius:12px;">
+        <div>
+          <h1>Sewa Restaurant</h1>
+          <p class="muted">Fast food — fresh & loved | Suchani, Jammu</p>
+        </div>
+      </div>
+      <a class="btn" href="#menu" style="background:#ff6b35;padding:10px 14px;border-radius:10px;color:white;text-decoration:none;font-weight:700;">View Menu</a>
+    </header>
+
+    <!-- ================= MENU SECTION ================= -->
+    <section id="menu" style="margin-top:50px;">
+      <h2 style="font-size:28px;font-weight:800;margin-bottom:12px;">Our Menu</h2>
+
+      <!-- Category Filters -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="north">North Indian</button>
+        <button class="filter-btn" data-filter="south">South Indian</button>
+        <button class="filter-btn" data-filter="snacks">Snacks</button>
+        <button class="filter-btn" data-filter="drinks">Drinks</button>
+      </div>
+
+      <!-- Menu Grid -->
+      <div class="menu-grid">
+
+        <div class="menu-card" data-category="north snacks">
+          <img src="pav.png" class="menu-img">
+          <h3>Pav Bhaji — ₹40</h3>
+          <p>Spicy mashed vegetable curry with buttery pav.</p>
+        </div>
+
+        <div class="menu-card" data-category="north">
+          <img src="chhole.png" class="menu-img">
+          <h3>Chole Bhature — ₹40</h3>
+          <p>Crispy bhature with rich spiced chole.</p>
+        </div>
+
+        <div class="menu-card" data-category="snacks">
+          <img src="pizza.png" class="menu-img">
+          <h3>Pizza — ₹60</h3>
+          <p>Cheesy soft-crust pizza with veggies.</p>
+        </div>
+
+        <div class="menu-card" data-category="drinks">
+          <img src="lassi.png" class="menu-img">
+          <h3>Mango Lassi — ₹30</h3>
+          <p>Refreshing yogurt mango drink.</p>
+        </div>
+
+        <div class="menu-card" data-category="south">
+          <img src="dosa.png" class="menu-img">
+          <h3>Masala Dosa — ₹50</h3>
+          <p>Crispy dosa with masala filling.</p>
+        </div>
+
+        <div class="menu-card" data-category="north">
+          <img src="biryani.jpg" class="menu-img">
+          <h3>Veg Biryani — ₹50</h3>
+          <p>Aromatic rice with veggies & spices.</p>
+        </div>
+
+        <div class="menu-card" data-category="snacks">
+          <img src="vada.jpeg" class="menu-img">
+          <h3>Vada Pav — ₹30</h3>
+          <p>Mumbai-style vada served in pav.</p>
+        </div>
+
+        <div class="menu-card" data-category="south">
+          <img src="rava.jpeg" class="menu-img">
+          <h3>Rava Dosa — ₹50</h3>
+          <p>Crispy dosa made with semolina batter.</p>
+        </div>
+
+        <div class="menu-card" data-category="snacks north">
+          <img src="samosa.png" class="menu-img">
+          <h3>Samosa — ₹20</h3>
+          <p>Golden crisp samosa stuffed with potatoes.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <hr style="margin:40px 0;border:none;border-top:1px solid #ddd;">
+
+
+    <!-- ================= ORDERING SECTION ================= -->
+    <div class="order-area" style="display:flex;gap:22px;">
+
+      <!-- MENU ITEMS FOR ORDERING -->
+      <div class="menu-column">
+        <div class="section-card">
+          <h3>Order Items</h3>
+
+          <div id="menu-list">
+
+            <div class="item-row" data-name="Pav Bhaji" data-price="40">
+              <div class="thumb-small"><img src="pav.png"></div>
+              <div>Pav Bhaji<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Chole Bhature" data-price="40">
+              <div class="thumb-small"><img src="chhole.png"></div>
+              <div>Chole Bhature<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Pizza" data-price="60">
+              <div class="thumb-small"><img src="pizza.png"></div>
+              <div>Pizza<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Mango Lassi" data-price="30">
+              <div class="thumb-small"><img src="lassi.png"></div>
+              <div>Mango Lassi<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Masala Dosa" data-price="50">
+              <div class="thumb-small"><img src="dosa.png"></div>
+              <div>Masala Dosa<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Veg Biryani" data-price="50">
+              <div class="thumb-small"><img src="biryani.jpg"></div>
+              <div>Veg Biryani<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Vada Pav" data-price="30">
+              <div class="thumb-small"><img src="vada.jpeg"></div>
+              <div>Vada Pav<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Rava Dosa" data-price="50">
+              <div class="thumb-small"><img src="rava.jpeg"></div>
+              <div>Rava Dosa<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+            <div class="item-row" data-name="Samosa" data-price="20">
+              <div class="thumb-small"><img src="samosa.png"></div>
+              <div>Samosa<br><span>Subtotal: <span class="row-sub-val">₹0</span></span></div>
+              <div class="qty-controls">
+                <button class="qty-btn dec">−</button>
+                <div class="qty-num">0</div>
+                <button class="qty-btn inc">+</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- CART -->
+      <div class="cart-column">
+
+        <div class="section-card">
+          <div style="display:flex;justify-content:space-between;">
+            <div class="cart-title">Your Cart</div>
+            <button id="cart-toggle" style="display:none;border:none;background:#eee;padding:6px 10px;border-radius:8px;cursor:pointer;">Hide</button>
+          </div>
+
+          <div id="cart-list" style="display:none"></div>
+          <div id="cart-total" class="cart-total" style="display:none">Total: ₹0</div>
+
+          <button id="place-order-btn" class="action-btn" style="display:none">Place Order</button>
+        </div>
+
+        <div class="section-card">
+          <h3>Quick Actions</h3>
+
+          <div class="quick-actions">
+            <input id="qa-order-number" type="number" placeholder="Order ID">
+
+            <button class="action-btn" id="qa-track">Track</button>
+            <button class="action-btn" id="qa-show">Show</button>
+            <button class="action-btn" id="qa-remove">Remove Item</button>
+            <button class="action-btn" id="qa-cancel">Cancel</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chatbot -->
+  <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+  <df-messenger intent="WELCOME" chat-title="Sewa Restaurant" agent-id="b461cfc8-dea0-42e3-9ecd-ad6ea394c0b6" language-code="en"></df-messenger>
+
+  <!-- WEBSITE SCRIPT -->
+  <script>
+
+    const API_BASE = "http://localhost:8000";
+
+    const itemRows = Array.from(document.querySelectorAll('.item-row'));
+    const cart = {};
+    itemRows.forEach(r => cart[r.dataset.name] = 0);
+
+    function formatPrice(n){
+      return '₹' + (Number(n)||0).toFixed(2);
+    }
+
+    function showToast(text, timeout=6000){
+      const old = document.querySelector('.result-toast');
+      if(old) old.remove();
+      const d = document.createElement('div');
+      d.className = 'result-toast';
+      d.textContent = text;
+      document.body.appendChild(d);
+      setTimeout(()=>d.remove(), timeout);
+    }
+
+    function updateCartUI(){
+      const cartList = document.getElementById("cart-list");
+      const cartTotal = document.getElementById("cart-total");
+      const placeBtn = document.getElementById("place-order-btn");
+      const toggleBtn = document.getElementById("cart-toggle");
+
+      let total = 0;
+      cartList.innerHTML = "";
+
+      itemRows.forEach(row=>{
+        const name = row.dataset.name;
+        const price = Number(row.dataset.price);
+        const qty = cart[name];
+
+        row.querySelector(".qty-num").textContent = qty;
+        row.querySelector(".row-sub-val").textContent = formatPrice(qty * price);
+
+        if(qty > 0){
+          cartList.innerHTML += `<div class="cart-row"><div>${name} × ${qty}</div><div>${formatPrice(qty*price)}</div></div>`;
+          total += qty * price;
+        }
+      });
+
+      if(total === 0){
+        cartList.style.display = "none";
+        cartTotal.style.display = "none";
+        placeBtn.style.display = "none";
+        toggleBtn.style.display = "none";
+      } else {
+        cartList.style.display = "block";
+        cartTotal.style.display = "block";
+        placeBtn.style.display = "block";
+        toggleBtn.style.display = "inline-block";
+        cartTotal.textContent = "Total: " + formatPrice(total);
+      }
+    }
+
+    itemRows.forEach(row => {
+      const name = row.dataset.name;
+      row.querySelector(".inc").onclick = () => { cart[name]++; updateCartUI(); };
+      row.querySelector(".dec").onclick = () => { if(cart[name]>0) cart[name]--; updateCartUI(); };
+    });
+
+    // PLACE ORDER
+    document.getElementById("place-order-btn").onclick = async ()=>{
+      const items = [];
+
+      itemRows.forEach(row=>{
+        const name = row.dataset.name;
+        const qty = cart[name];
+        if(qty>0) items.push({name,quantity:qty});
+      });
+
+      if(items.length === 0) return showToast("Your cart is empty.");
+
+      const res = await fetch(`${API_BASE}/api/create-order`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({items})
+      });
+
+      const data = await res.json();
+
+      if(data.success){
+        showToast(`✅ Order placed! #${data.order_id}\nTotal: ${formatPrice(data.total)}`);
+      } else {
+        showToast("❌ Failed: " + data.message);
+      }
+    };
+
+    // fetch helper
+    async function fetchJson(url, opts){
+      try {
+        const r = await fetch(url, opts);
+        return { ok:true, data: await r.json() };
+      } catch(e){
+        return { ok:false };
+      }
+    }
+
+    // TRACK ORDER
+    document.getElementById("qa-track").onclick = async ()=>{
+      const id = document.getElementById("qa-order-number").value;
+      if(!id) return showToast("⚠️ Enter Order ID");
+
+      const r = await fetchJson(`${API_BASE}/api/show-order/${id}`);
+
+      if(!r.ok) return showToast("❌ Network error");
+      if(!r.data.success) return showToast(`❌ ${r.data.message}`);
+
+      const status = r.data.status.toUpperCase();
+      const items = r.data.items || [];
+
+      let count = 0;
+      items.forEach(i => count += Number(i[1] || i.quantity || 0));
+
+      showToast(`📦 Order #${id} is "${status}"\nItems: ${count}`);
+    };
+
+    // SHOW ORDER
+    document.getElementById("qa-show").onclick = async ()=>{
+      const id = document.getElementById("qa-order-number").value;
+      if(!id) return showToast("⚠️ Enter Order ID");
+
+      const r = await fetchJson(`${API_BASE}/api/show-order/${id}`);
+
+      if(!r.ok) return showToast("❌ Network error");
+      if(!r.data.success) return showToast(`❌ ${r.data.message}`);
+
+      let msg = `Order #${id} — Status: ${r.data.status}\n\n🍽 Items:\n`;
+      const items = r.data.items || [];
+
+      items.forEach(row=>{
+        msg += `• ${row[0]} — ${row[1]} × ${formatPrice(row[2])} = ${formatPrice(row[3])}\n`;
+      });
+
+      msg += `\n💰 Total: ${formatPrice(r.data.total)}`;
+      showToast(msg, 9000);
+    };
+
+    // CANCEL ORDER
+    document.getElementById("qa-cancel").onclick = async ()=>{
+      const id = document.getElementById("qa-order-number").value;
+      if(!id) return showToast("⚠️ Enter Order ID");
+
+      const r = await fetchJson(`${API_BASE}/api/cancel-order/${id}`, {method:"POST"});
+
+      if(!r.ok) return showToast("❌ Network error");
+      if(r.data.success) showToast(`✔️ Order #${id} cancelled.`);
+      else showToast(`❌ ${r.data.message}`);
+    };
+
+    // REMOVE ITEM
+    document.getElementById("qa-remove").onclick = async ()=>{
+      const id = document.getElementById("qa-order-number").value;
+      if(!id) return showToast("⚠️ Enter Order ID");
+
+      const item = prompt("Enter item to remove:");
+      if(!item) return;
+
+      const r = await fetchJson(`${API_BASE}/api/remove-item`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({order_id:id,item})
+      });
+
+      if(!r.ok) return showToast("❌ Network error");
+
+      if(r.data.success)
+        showToast(r.data.message || `Removed ${item} from order #${id}.`);
+      else
+        showToast("❌ " + r.data.message);
+    };
+
+    updateCartUI();
+
+    // CATEGORY FILTERS
+    const filterBtns = document.querySelectorAll(".filter-btn");
+    const menuCards = document.querySelectorAll(".menu-card");
+
+    filterBtns.forEach(btn=>{
+      btn.onclick = ()=>{
+        filterBtns.forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const cat = btn.dataset.filter;
+
+        menuCards.forEach(card=>{
+          if(cat === "all") card.style.display = "block";
+          else {
+            const categories = card.dataset.category.split(" ");
+            card.style.display = categories.includes(cat) ? "block" : "none";
+          }
+        });
+      };
+    });
+
+    // Smooth scroll
+    document.querySelector('a[href="#menu"]').addEventListener("click", function(e){
+      e.preventDefault();
+      document.querySelector("#menu").scrollIntoView({ behavior: "smooth" });
+    });
+
+  </script>
+
+</body>
+</html>
